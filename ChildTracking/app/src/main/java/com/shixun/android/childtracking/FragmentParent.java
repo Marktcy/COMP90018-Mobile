@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +31,10 @@ import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.squareup.okhttp.OkHttpClient;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
@@ -45,8 +50,10 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
     private LatLng                             userLocation;
     private MobileServiceClient                mClient;
     private MobileServiceTable<ParentLocation> mTable;
+    private MobileServiceTable<ChildLocation>  mCTable;
     private final static int                   PLACE_PICKER_REQUEST = 1;
     private Place                              place;
+//    private TrackingChildService.TrackingBinder mTrackingBinder;
 
     @BindView(R.id.tvPlaceName)
     TextView placeNameText;
@@ -58,6 +65,8 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
     Button setBoundary;
     @BindView(R.id.btGetPlace)
     Button getPlaceButton;
+    @BindView(R.id.btStartTracking)
+    Button btStartTracking;
     @BindView(R.id.map)
     MapView mapView;
 
@@ -87,6 +96,8 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        EventBus.getDefault().register(this);
+
         // set the title
         ((AppCompatActivity) getActivity())
                 .getSupportActionBar()
@@ -115,6 +126,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
             // Get the Mobile Service Table instance to use
             mTable = mClient.getTable(ParentLocation.class);
+            mCTable = mClient.getTable(ChildLocation.class);
 
         } catch (MalformedURLException e) {
             createAndShowDialog(new Exception("There was an error creating the Mobile Service. Verify the URL"), "Error");
@@ -185,7 +197,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
             runAsyncTask(task);
 
             mMap.clear();
-            mMap.addMarker(new MarkerOptions().position(userLocation).title("Your ChildLocation"));
+            mMap.addMarker(new MarkerOptions().position(userLocation).title("Center"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
             mMap.addCircle(new CircleOptions()
                     .center(userLocation)
@@ -197,7 +209,45 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         }
     }
 
+    @OnClick(R.id.btStartTracking)
+    void startTracking() {
+        if(getActivity() instanceof ActionListener) {
+            ((ActionListener) getActivity()).startTracking();
+        }
+    }
 
+    @OnClick(R.id.btStopTracking)
+    void stopTracking() {
+        if(getActivity() instanceof ActionListener) {
+            ((ActionListener) getActivity()).stopTracking();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(LatLng latLng) {
+        Log.d("##############", Double.toString(latLng.latitude));
+        Log.d("##############", Double.toString(latLng.longitude));
+
+        mMap.addMarker(new MarkerOptions().position(latLng).title("Your Child Location"));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    //    private ServiceConnection mConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            mTrackingBinder = (TrackingChildService.TrackingBinder) service;
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//
+//        }
+//    };
 
     /**
      * Creates a dialog and shows it

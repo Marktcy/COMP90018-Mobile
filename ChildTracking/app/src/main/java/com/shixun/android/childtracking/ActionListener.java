@@ -7,4 +7,6 @@ package com.shixun.android.childtracking;
 public interface ActionListener {
     void loginAsParent();
     void loginAsChild();
+    void startTracking();
+    void stopTracking();
 }

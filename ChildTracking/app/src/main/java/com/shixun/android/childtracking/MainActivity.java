@@ -1,6 +1,7 @@
 package com.shixun.android.childtracking;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +45,18 @@ public class MainActivity extends AbstractFragmentActivity implements ActionList
     @Override
     public void loginAsChild() {
         nevigateToFragment(FragmentChild.class, false, null);
+    }
+
+    @Override
+    public void startTracking() {
+        Intent startIntent = new Intent(this, TrackingChildService.class);
+        startService(startIntent);
+    }
+
+    @Override
+    public void stopTracking() {
+        Intent stopIntent = new Intent(this, TrackingChildService.class);
+        stopService(stopIntent);
     }
 
     private void nevigateToFragment(Class FragmentGeneral, boolean isUpSet, Bundle bundle) {
@@ -103,5 +116,10 @@ public class MainActivity extends AbstractFragmentActivity implements ActionList
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
