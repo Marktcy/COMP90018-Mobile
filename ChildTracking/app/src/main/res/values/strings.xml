@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">ChildTracking</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">LOGIN</string>
+    <string name="parent">Parent</string>
+    <string name="child">Child</string>
+    <string name="setBoundary">Set Boundary</string>
+
+    <string-array name="member">
+        <item>@string/parent</item>
+        <item>@string/child</item>
+    </string-array>
+
+</resources>
