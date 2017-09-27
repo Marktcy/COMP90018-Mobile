@@ -48,15 +48,15 @@ import static com.google.android.gms.internal.zzagz.runOnUiThread;
 
 public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback {
 
-    private GoogleMap childMap;
-    LocationManager locationManager;
-    LocationListener locationListener;
-    String serviceProvider;
-    MobileServiceClient mClient;
-    MobileServiceTable<ChildLocation> mTable;
-    MobileServiceTable<ParentLocation> mPtable;
-    List<ParentLocation> parentLocations;
-    LatLng userLocation;
+    private GoogleMap                          childMap;
+    private LocationManager                    locationManager;
+    private LocationListener                   locationListener;
+    private String                             serviceProvider;
+    private MobileServiceClient                mClient;
+    private MobileServiceTable<ChildLocation>  mTable;
+    private MobileServiceTable<ParentLocation> mPtable;
+    private List<ParentLocation>               parentLocations;
+    private LatLng                             userLocation;
 
     @BindView(R.id.child_map)
     MapView mapView;
@@ -123,7 +123,7 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
         try {
             // Mobile Service URL and key
             mClient = new MobileServiceClient(
-                    "https://positiontracking.azurewebsites.net",
+                    getResources().getString(R.string.server),
                     getActivity());
 
             // Extend timeout from default of 10s to 20s
@@ -269,16 +269,19 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
             } else {
 
                 locationManager.requestLocationUpdates(serviceProvider, 0, 0, locationListener);
-
-                android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(serviceProvider);
-
+                Location lastKnownLocation = locationManager.getLastKnownLocation(serviceProvider);
                 LatLng userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
                 childMap.clear();
-
                 childMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
                 childMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        locationManager.removeUpdates(locationListener);
     }
 
     /**

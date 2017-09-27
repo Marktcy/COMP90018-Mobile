@@ -39,13 +39,14 @@ import butterknife.OnClick;
 import static android.app.Activity.RESULT_OK;
 import static com.google.android.gms.internal.zzagz.runOnUiThread;
 
-public class FragmentParent extends FragmentGeneral implements OnMapReadyCallback{
+public class FragmentParent extends FragmentGeneral implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
-    private LatLng userLocation;
-    MobileServiceClient mClient;
-    MobileServiceTable<ParentLocation> mTable;
-    private final static int PLACE_PICKER_REQUEST = 1;
+    private GoogleMap                          mMap;
+    private LatLng                             userLocation;
+    private MobileServiceClient                mClient;
+    private MobileServiceTable<ParentLocation> mTable;
+    private final static int                   PLACE_PICKER_REQUEST = 1;
+    private Place                              place;
 
     @BindView(R.id.tvPlaceName)
     TextView placeNameText;
@@ -95,12 +96,10 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
                 .setTitle(getResources().getString(R.string.setBoundary));
         super.onResume();
 
-        // ask for permission of location service
-
         try {
             // Mobile Service URL and key
             mClient = new MobileServiceClient(
-                    "https://positiontracking.azurewebsites.net",
+                    getResources().getString(R.string.server),
                     getActivity());
 
             // Extend timeout from default of 10s to 20s
@@ -129,22 +128,10 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(getActivity(), data);
+                place = PlacePicker.getPlace(getActivity(), data);
                 placeNameText.setText(place.getName());
                 placeAddressText.setText(place.getAddress());
-
-                mMap.clear();
-
                 userLocation = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
-                mMap.addMarker(new MarkerOptions().position(userLocation).title("Your ChildLocation"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
-                mMap.addCircle(new CircleOptions()
-                        .center(userLocation)
-                        .radius(Integer.parseInt(radius.getText().toString()))
-                        .strokeWidth(10)
-                        .strokeColor(Color.GREEN)
-                        .fillColor(Color.argb(128, 255, 0, 0))
-                        .clickable(true));
             }
         }
     }
@@ -170,28 +157,47 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
     @OnClick(R.id.btSetBoundary)
     void setBoundary() {
-        final ParentLocation boundary = new ParentLocation(userLocation.longitude, userLocation.latitude, Integer.parseInt(radius.getText().toString()));
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    mTable.insert(boundary).get();
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity(), "Added Successfully", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } catch (final Exception e) {
-                    createAndShowDialogFromTask(e, "Error");
+        final ParentLocation boundary;
+
+        if (userLocation  == null || radius.getText().toString().equals("")) {
+            Toast.makeText(getActivity(), "Please set location or radius", Toast.LENGTH_SHORT).show();
+        } else {
+            boundary = new ParentLocation(userLocation.longitude, userLocation.latitude, Integer.parseInt(radius.getText().toString()));
+            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        mTable.insert(boundary).get();
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), "Added Successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } catch (final Exception e) {
+                        createAndShowDialogFromTask(e, "Error");
+                    }
+                    return null;
                 }
-                return null;
-            }
-        };
+            };
+            runAsyncTask(task);
 
-        runAsyncTask(task);
+            mMap.clear();
+            mMap.addMarker(new MarkerOptions().position(userLocation).title("Your ChildLocation"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+            mMap.addCircle(new CircleOptions()
+                    .center(userLocation)
+                    .radius(Integer.parseInt(radius.getText().toString()))
+                    .strokeWidth(10)
+                    .strokeColor(Color.GREEN)
+                    .fillColor(Color.argb(128, 255, 0, 0))
+                    .clickable(true));
+        }
     }
+
+
 
     /**
      * Creates a dialog and shows it
