@@ -8,6 +8,14 @@
     <string name="child">Child</string>
     <string name="setBoundary">Set Boundary</string>
     <string name="server">https://positiontracking.azurewebsites.net</string>
+    <string name="btRegister">REGISTER</string>
+    <string name="btLogin">LOGIN</string>
+    <string name="myemail">Account ( Email )</string>
+    <string name="email">Email</string>
+    <string name="mypassword">Set password</string>
+    <string name="name">Name</string>
+    <string name="repassword">Enter password again</string>
+    <string name="role">Select your role</string>
 
     <string-array name="member">
         <item>@string/parent</item>
