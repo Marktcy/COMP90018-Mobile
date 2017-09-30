@@ -3,12 +3,6 @@ package com.shixun.android.childtracking;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
-import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
-import com.microsoft.windowsazure.mobileservices.table.sync.pull.IncrementalPullStrategy;
-
-import java.net.MalformedURLException;
-
 import butterknife.OnClick;
 
 /**
@@ -31,7 +25,7 @@ public class FragmentHome extends FragmentGeneral {
     void jumpToLogin() {
     }
 
-    @OnClick(R.id.btRegister)
+    @OnClick(R.id.register)
     void register() {
         if(getActivity() instanceof ActionListener) {
             ((ActionListener) getActivity()).jumpToRegister();

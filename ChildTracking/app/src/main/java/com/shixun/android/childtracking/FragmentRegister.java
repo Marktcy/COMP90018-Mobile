@@ -2,21 +2,25 @@ package com.shixun.android.childtracking;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
+import android.util.Pair;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by gongmengyu on 2017/9/29.
@@ -25,7 +29,6 @@ import butterknife.OnClick;
 public class FragmentRegister extends FragmentGeneral {
     private MobileServiceClient mobileServiceClient;
     private MobileServiceTable<UserDatabase> mobileServiceTable;
-    private List<Pair<String, String>> parameters = new ArrayList<>();
 
     @BindView(R.id.name)
     EditText name;
@@ -37,6 +40,8 @@ public class FragmentRegister extends FragmentGeneral {
     EditText repassword;
     @BindView(R.id.member)
     Spinner spMemeber;
+    @BindView(R.id.btRegister)
+    Button register;
 
     @Override
     protected int getLayoutID() {
@@ -56,44 +61,53 @@ public class FragmentRegister extends FragmentGeneral {
     }
 
     @OnClick(R.id.btRegister)
-    void register() {
+    void signup() {
         try {
             mobileServiceClient = new MobileServiceClient(getResources().getString(R.string.server), getActivity());
             mobileServiceTable = mobileServiceClient.getTable(UserDatabase.class);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+
         if (isAccountPasswordValid()) {
 
-            UserDatabase newUser = new UserDatabase(email.getText().toString(),password.getText().toString(),name.getText().toString(), spMemeber.getSelectedItem().toString().equals("Parent"));
+            final UserDatabase newUser = new UserDatabase(email.getText().toString(),password.getText().toString(),name.getText().toString(), spMemeber.getSelectedItem().toString().equals("Parent"));
 
-            String userAccount = email.getText().toString().trim();
-            String userPassword = password.getText().toString().trim();
+            String userAccount = email.getText().toString();
+            String userPassword = password.getText().toString();
+
+            ArrayList<Pair<String, String>> parameters = new ArrayList<>();
 
             parameters.add(new Pair<>("email", userAccount));
             parameters.add(new Pair<>("password", userPassword));
             parameters.add(new Pair<>("type", "isEmailExist"));
 
+            ListenableFuture<CheckEmail> result = mobileServiceClient.invokeApi("Authentication", "GET", parameters, CheckEmail.class);
+            Futures.addCallback(result, new FutureCallback<CheckEmail>() {
+                @Override
+                public void onSuccess(CheckEmail result) {
+                    if (result.result.equals("NotExist")) {
+                        mobileServiceTable.insert(newUser);
+                        new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText("Good job!")
+                                .setContentText("You register the account!")
+                                .show();
+                    } else {
+                        new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("Oops...")
+                                .setContentText("This Email is already registered!")
+                                .show();
+                    }
+                }
 
-
-           // ListenableFuture<CheckEmail> result = mobileServiceClient.invokeApi("Authentication", "GET", parameters, CheckEmail.class);
-
-            mobileServiceTable.insert(newUser);
-//            int user = UserDataManager.findUserByName(userAccount);
-//
-//            if (user > 0) {
-//                Toast.makeText(getActivity(), "User has existed", Toast.LENGTH_SHORT).show();
-//                return;
-//            } else {
-//                UserDatabase newUser = new UserDatabase(userAccount, userPassword);
-//                mobileServiceTable.insert(newUser);
-//                if (add == -1) {
-//                    Toast.makeText(getActivity(), "Register fail", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    Toast.makeText(getActivity(), "Rigister success", Toast.LENGTH_SHORT).show();
-//                    ((ActionListener) getActivity()).jumpToLogin();
-//                }
-//            }
+                @Override
+                public void onFailure(Throwable throwable) {
+                    new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Oops...")
+                            .setContentText("Register failed!")
+                            .show();
+                }
+            });
         }
     }
 
@@ -117,10 +131,6 @@ public class FragmentRegister extends FragmentGeneral {
             Toast.makeText(getActivity(), "Please select your role", Toast.LENGTH_SHORT).show();
             return false;
         }
-
         return true;
     }
-
-
-
 }

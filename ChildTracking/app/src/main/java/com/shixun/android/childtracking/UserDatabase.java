@@ -17,7 +17,6 @@ public class UserDatabase {
     @com.google.gson.annotations.SerializedName("Role")
     private boolean isParent;
 
-
     public UserDatabase(String userAccount, String userPassword, String name, boolean isParent) {
         this.userAccount=userAccount;
         this.userPassword=userPassword;
