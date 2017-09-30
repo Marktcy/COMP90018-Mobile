@@ -68,7 +68,7 @@ public class TrackingChildService extends Service {
             @Override
             public void run() {
                 try {
-                    mCTable.execute("IF EXISTS (SELECT * FROM ChildLocations)");
+//                    mCTable.execute("IF EXISTS (SELECT * FROM ChildLocations)");
                     mChildLocation = mCTable.where().orderBy("CreatedAt", QueryOrder.Descending).execute().get().get(0);
                     mLatLng = new LatLng(mChildLocation.getLatitude(), mChildLocation.getLongtitude());
                     EventBus.getDefault().post(mLatLng);

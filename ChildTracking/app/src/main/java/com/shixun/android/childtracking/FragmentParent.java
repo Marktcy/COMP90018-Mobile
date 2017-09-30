@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +42,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.net.MalformedURLException;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -65,6 +67,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
     private ImageView                          stopTracking;
     private Marker                             childMarker;
     private String                             radius;
+    private TextToSpeech                       mTextToSpeech;
 
     @BindView(R.id.etRadius)
     EditText etRadius;
@@ -120,6 +123,15 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         super.onActivityCreated(savedInstanceState);
 
         EventBus.getDefault().register(this);
+
+        mTextToSpeech=new TextToSpeech(getContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    mTextToSpeech.setLanguage(Locale.UK);
+                }
+            }
+        });
 
         if (toolbar != null) {
             // set the title
@@ -314,14 +326,21 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
         double distance = SphericalUtil.computeDistanceBetween(latLng, place.getLatLng());
         if (distance > Double.parseDouble(radius)) {
-            this.vibrator.vibrate(1000);
+            //this.vibrator.vibrate(500);
+            mTextToSpeech.speak("Your child is out of boundary", TextToSpeech.QUEUE_FLUSH, null,"1");
         }
     }
+
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        if(mTextToSpeech !=null){
+            mTextToSpeech.stop();
+            mTextToSpeech.shutdown();
+        }
     }
 
     /**
