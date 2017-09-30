@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="MS_TableConnectionString-Web.config Connection String" description="MS_TableConnectionString Connection String used in web.config by the application to access the database." defaultValue="Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\aspnet-PositionTrackingService-20170924111236.mdf;Initial Catalog=aspnet-PositionTrackingService-20170924111236;Integrated Security=True;MultipleActiveResultSets=True" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\mark_\\Desktop\\Mobile\\Assignment2\\PositionTrackingService\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='MS_TableConnectionString']/@connectionString" />
+  </parameter>
+  <parameter name="MS_TableConnectionString_DatabasePublish-Web.config Connection String" description="MS_TableConnectionString_DatabasePublish Connection String used in web.config by the application to access the database." defaultValue="MS_TableConnectionString_DatabasePublish.ConnetionString" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\mark_\\Desktop\\Mobile\\Assignment2\\PositionTrackingService\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='MS_TableConnectionString_DatabasePublish']/@connectionString" />
+  </parameter>
+</parameters>
