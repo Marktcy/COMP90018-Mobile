@@ -67,8 +67,8 @@ public class TrackingChildService extends Service {
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Log.d("******************", "run: ");
                 try {
+                    mCTable.execute("IF EXISTS (SELECT * FROM ChildLocations)");
                     mChildLocation = mCTable.where().orderBy("CreatedAt", QueryOrder.Descending).execute().get().get(0);
                     mLatLng = new LatLng(mChildLocation.getLatitude(), mChildLocation.getLongtitude());
                     EventBus.getDefault().post(mLatLng);

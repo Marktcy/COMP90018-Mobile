@@ -8,6 +8,11 @@
     <string name="child">Child</string>
     <string name="setBoundary">Set Boundary</string>
     <string name="server">https://positiontracking.azurewebsites.net</string>
+    <string name="boundary">BOUNDARY</string>
+    <string name="tracking">START TRACKING</string>
+    <string name="stop">STOP TRACKING</string>
+    <string name="settings">SETTINGS</string>
+    <string name="radius">TYPE IN RADIUS</string>
 
     <string-array name="member">
         <item>@string/parent</item>

@@ -8,11 +8,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -23,13 +24,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.SphericalUtil;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.squareup.okhttp.OkHttpClient;
+import com.yalantis.guillotine.animation.GuillotineAnimation;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -40,11 +45,12 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static android.app.Activity.RESULT_OK;
 import static com.google.android.gms.internal.zzagz.runOnUiThread;
 
-public class FragmentParent extends FragmentGeneral implements OnMapReadyCallback {
+public class FragmentParent extends FragmentGeneral implements OnMapReadyCallback, View.OnClickListener {
 
     private GoogleMap                          mMap;
     private LatLng                             userLocation;
@@ -53,22 +59,26 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
     private MobileServiceTable<ChildLocation>  mCTable;
     private final static int                   PLACE_PICKER_REQUEST = 1;
     private Place                              place;
-//    private TrackingChildService.TrackingBinder mTrackingBinder;
+    private View                               guillotineMenu;
+    private ImageView                          setBoundary;
+    private ImageView                          startTracking;
+    private ImageView                          stopTracking;
+    private Marker                             childMarker;
+    private String                             radius;
 
-    @BindView(R.id.tvPlaceName)
-    TextView placeNameText;
-    @BindView(R.id.tvPlaceAddress)
-    TextView placeAddressText;
     @BindView(R.id.etRadius)
-    EditText radius;
-    @BindView(R.id.btSetBoundary)
-    Button setBoundary;
-    @BindView(R.id.btGetPlace)
-    Button getPlaceButton;
-    @BindView(R.id.btStartTracking)
-    Button btStartTracking;
+    EditText etRadius;
+    @BindView(R.id.btConfirmBoundary)
+    at.markushi.ui.CircleButton btConfirmBoundary;
     @BindView(R.id.map)
     MapView mapView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.root)
+    FrameLayout root;
+    @BindView(R.id.content_hamburger)
+    View contentHamburger;
+
 
     /**
      * Rewrite the method of FragmentGeneral
@@ -76,7 +86,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
      */
     @Override
     protected int getLayoutID() {
-        return R.layout.fragment_set_boundary;
+        return R.layout.fragment_monitoring;
     }
 
     /**
@@ -90,6 +100,19 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
         mapView.getMapAsync(this);
+        guillotineMenu = LayoutInflater.from(getActivity()).inflate(R.layout.guillotine, null);
+        root.addView(guillotineMenu);
+        new GuillotineAnimation.GuillotineBuilder(guillotineMenu, guillotineMenu.findViewById(R.id.guillotine_hamburger), contentHamburger)
+                .setStartDelay(10)
+                .setActionBarViewForAnimation(toolbar)
+                .setClosedOnStart(true)
+                .build();
+        setBoundary = (ImageView) guillotineMenu.findViewById(R.id.set_boundary);
+        startTracking = (ImageView) guillotineMenu.findViewById(R.id.start_tracking);
+        stopTracking = (ImageView) guillotineMenu.findViewById(R.id.stop_tracking);
+        setBoundary.setOnClickListener(this);
+        startTracking.setOnClickListener(this);
+        stopTracking.setOnClickListener(this);
     }
 
     @Override
@@ -98,14 +121,13 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
         EventBus.getDefault().register(this);
 
-        // set the title
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setTitle(getResources().getString(R.string.setBoundary));
-        super.onResume();
+        if (toolbar != null) {
+            // set the title
+            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+            ((AppCompatActivity) getActivity())
+                    .getSupportActionBar()
+                    .setTitle(null);
+        }
 
         try {
             // Mobile Service URL and key
@@ -133,6 +155,8 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         } catch (Exception e) {
             createAndShowDialog(e, "Error");
         }
+
+
     }
 
     @Override
@@ -141,8 +165,6 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
-                placeNameText.setText(place.getName());
-                placeAddressText.setText(place.getAddress());
                 userLocation = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
             }
         }
@@ -153,82 +175,147 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         mMap = googleMap;
     }
 
-    @OnClick(R.id.btGetPlace)
-    void getPlace() {
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        try {
-            Intent intent = builder.build(getActivity());
-            startActivityForResult(intent, PLACE_PICKER_REQUEST);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.set_boundary:
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    Intent intent = builder.build(getActivity());
+                    startActivityForResult(intent, PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+            case R.id.start_tracking:
+                if(getActivity() instanceof ActionListener) {
+                    new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                            .setTitleText("Are you sure?")
+                            .setContentText("Start tracking the child!")
+                            .setCancelText("No,cancel plx!")
+                            .setConfirmText("Yes,do it!")
+                            .showCancelButton(true)
+                            .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+                                    sDialog.cancel();
+                                }
+                            })
+                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+                                    sDialog.dismissWithAnimation();
+                                    ((ActionListener) getActivity()).startTracking();
+                                }
+                            })
+                            .show();
+                }
+
+                break;
+            case R.id.stop_tracking:
+                if(getActivity() instanceof ActionListener) {
+                    new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                            .setTitleText("Are you sure?")
+                            .setContentText("Stop tracking the child!")
+                            .setCancelText("No,cancel plx!")
+                            .setConfirmText("Yes,do it!")
+                            .showCancelButton(true)
+                            .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+                                    sDialog.cancel();
+                                }
+                            })
+                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+                                    sDialog.dismissWithAnimation();
+                                    ((ActionListener) getActivity()).stopTracking();
+                                    if (childMarker != null) {
+                                        childMarker.remove();
+                                    }
+                                }
+                            })
+                            .show();
+                }
+                break;
         }
     }
 
 
-    @OnClick(R.id.btSetBoundary)
+    @OnClick(R.id.btConfirmBoundary)
     void setBoundary() {
 
-        final ParentLocation boundary;
+        radius = etRadius.getText().toString();
 
-        if (userLocation  == null || radius.getText().toString().equals("")) {
+        if (userLocation  == null || radius.equals("")) {
             Toast.makeText(getActivity(), "Please set location or radius", Toast.LENGTH_SHORT).show();
         } else {
-            boundary = new ParentLocation(userLocation.longitude, userLocation.latitude, Integer.parseInt(radius.getText().toString()));
-            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        mTable.insert(boundary).get();
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "Added Successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } catch (final Exception e) {
-                        createAndShowDialogFromTask(e, "Error");
-                    }
-                    return null;
-                }
-            };
-            runAsyncTask(task);
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Are you sure?")
+                    .setContentText("The boundary " + radius + "M will be set around " + place.getAddress() + "!")
+                    .setCancelText("No,cancel plx!")
+                    .setConfirmText("Yes,do it!")
+                    .showCancelButton(true)
+                    .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sDialog) {
+                            sDialog.cancel();
+                        }
+                    })
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sDialog) {
+                            sDialog.dismissWithAnimation();
+                            final ParentLocation boundary = new ParentLocation(userLocation.longitude, userLocation.latitude, Integer.parseInt(radius));
+                            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Void... params) {
+                                    try {
+                                        mTable.insert(boundary).get();
+                                    } catch (final Exception e) {
+                                        createAndShowDialogFromTask(e, "Error");
+                                    }
+                                    return null;
+                                }
+                            };
 
-            mMap.clear();
-            mMap.addMarker(new MarkerOptions().position(userLocation).title("Center"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
-            mMap.addCircle(new CircleOptions()
-                    .center(userLocation)
-                    .radius(Integer.parseInt(radius.getText().toString()))
-                    .strokeWidth(10)
-                    .strokeColor(Color.GREEN)
-                    .fillColor(Color.argb(128, 255, 0, 0))
-                    .clickable(true));
-        }
-    }
+                            runAsyncTask(task);
 
-    @OnClick(R.id.btStartTracking)
-    void startTracking() {
-        if(getActivity() instanceof ActionListener) {
-            ((ActionListener) getActivity()).startTracking();
-        }
-    }
-
-    @OnClick(R.id.btStopTracking)
-    void stopTracking() {
-        if(getActivity() instanceof ActionListener) {
-            ((ActionListener) getActivity()).stopTracking();
+                            mMap.clear();
+                            mMap.addMarker(new MarkerOptions().position(userLocation).title("Center"));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 20));
+                            mMap.addCircle(new CircleOptions()
+                                    .center(userLocation)
+                                    .radius(Integer.parseInt(radius))
+                                    .strokeWidth(2)
+                                    .strokeColor(Color.GREEN)
+                                    .fillColor(Color.argb(128, 255, 0, 0))
+                                    .clickable(false));
+                        }
+                    })
+                    .show();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LatLng latLng) {
-        Log.d("##############", Double.toString(latLng.latitude));
-        Log.d("##############", Double.toString(latLng.longitude));
+        if (childMarker != null) {
+            childMarker.remove();
+        }
+        childMarker = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title("Your Child Location"));
 
-        mMap.addMarker(new MarkerOptions().position(latLng).title("Your Child Location"));
+        double distance = SphericalUtil.computeDistanceBetween(latLng, place.getLatLng());
+        if (distance > Double.parseDouble(radius)) {
+            this.vibrator.vibrate(1000);
+        }
     }
 
     @Override
@@ -236,18 +323,6 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         super.onDestroy();
         EventBus.getDefault().unregister(this);
     }
-
-    //    private ServiceConnection mConnection = new ServiceConnection() {
-//        @Override
-//        public void onServiceConnected(ComponentName name, IBinder service) {
-//            mTrackingBinder = (TrackingChildService.TrackingBinder) service;
-//        }
-//
-//        @Override
-//        public void onServiceDisconnected(ComponentName name) {
-//
-//        }
-//    };
 
     /**
      * Creates a dialog and shows it

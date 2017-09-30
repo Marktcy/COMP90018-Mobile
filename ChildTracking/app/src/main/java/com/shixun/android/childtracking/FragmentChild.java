@@ -26,7 +26,6 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.SphericalUtil;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
@@ -169,30 +168,8 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
                     @Override
                     protected Void doInBackground(Void... params) {
                         try {
+                            mClient.invokeApi("ClearChildLocation");
                             mTable.insert(currentChildLocation);
-                            parentLocations = mPtable.execute().get();
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (ParentLocation temp : parentLocations) {
-                                        int radius = temp.getRadius();
-
-                                        double pLatitude = temp.getLagitude();
-                                        double pLongtitude = temp.getLongtitude();
-                                        LatLng plocation = new LatLng(pLatitude, pLongtitude);
-
-                                        double distance = SphericalUtil.computeDistanceBetween(userLocation, plocation);
-
-                                        if (distance > radius) {
-                                            Toast.makeText(getActivity(), "You are out of boundary", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(getActivity(), "You are within boundary", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                    Toast.makeText(getActivity(), "Added Successfully", Toast.LENGTH_SHORT).show();
-                                }
-                            });
                         } catch (final Exception e) {
                             createAndShowDialogFromTask(e, "Error");
                         }
