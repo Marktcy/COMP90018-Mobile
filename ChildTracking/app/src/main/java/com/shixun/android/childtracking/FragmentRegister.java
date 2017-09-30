@@ -8,8 +8,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListenableFutureTask;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 
@@ -77,7 +75,8 @@ public class FragmentRegister extends FragmentGeneral {
             parameters.add(new Pair<>("type", "isEmailExist"));
 
 
-            ListenableFuture<CheckEmail> result = mobileServiceClient.invokeApi("Authentication", "GET", parameters, CheckEmail.class);
+
+           // ListenableFuture<CheckEmail> result = mobileServiceClient.invokeApi("Authentication", "GET", parameters, CheckEmail.class);
 
             mobileServiceTable.insert(newUser);
 //            int user = UserDataManager.findUserByName(userAccount);
