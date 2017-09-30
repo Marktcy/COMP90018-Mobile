@@ -1,36 +1,22 @@
 package com.shixun.android.childtracking;
 
 /**
- * Created by shixunliu on 25/9/17.
+ * Created by markchunyong on 2017/9/30.
  */
 
 public class ChildLocation {
 
-    /**
-     * Item text
-     */
     @com.google.gson.annotations.SerializedName("longtitude")
-    private double mLongtitude;
-
-    /**
-     * Item Id
-     */
+    private double mLongtitude;                                 //Children location longtitude
     @com.google.gson.annotations.SerializedName("id")
-    private String mId;
-
-    /**
-     * Indicates if the item is completed
-     */
+    private String mId;                                         //Children location data ID
     @com.google.gson.annotations.SerializedName("latitude")
-    private double mLatitude;
+    private double mLatitude;                                   //Children location latitude
 
-    /**
-     * ToDoItem constructor
-     */
-    public ChildLocation() {
+    //Constructor
+    public ChildLocation() {}
 
-    }
-
+    //Set of accessor and mutator
     public double getLongtitude() {
         return mLongtitude;
     }
@@ -53,10 +39,5 @@ public class ChildLocation {
 
     public void setLatitude(double latitude) {
         mLatitude = latitude;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof ChildLocation && ((ChildLocation) o).mId == mId;
     }
 }

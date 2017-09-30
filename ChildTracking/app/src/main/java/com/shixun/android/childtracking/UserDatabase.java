@@ -1,22 +1,23 @@
 package com.shixun.android.childtracking;
 
 /**
- * Created by gongmengyu on 2017/9/29.
+ * Created by markchunyong on 2017/9/30.
  */
 
 public class UserDatabase {
 
     @com.google.gson.annotations.SerializedName("Id")
-    private String id;
+    private String id;                                      //Data ID
     @com.google.gson.annotations.SerializedName("Name")
-    private String name;
+    private String name;                                    //Person Name
     @com.google.gson.annotations.SerializedName("Email")
-    private String userAccount;
+    private String userAccount;                             //User account (Use email as account)
     @com.google.gson.annotations.SerializedName("Password")
-    private String userPassword;
+    private String userPassword;                            //User password
     @com.google.gson.annotations.SerializedName("Role")
-    private boolean isParent;
+    private boolean isParent;                               //Role of persons
 
+    //Consturct data
     public UserDatabase(String userAccount, String userPassword, String name, boolean isParent) {
         this.userAccount=userAccount;
         this.userPassword=userPassword;
@@ -24,6 +25,7 @@ public class UserDatabase {
         this.isParent=isParent;
     }
 
+    //Set of assessor and mutator
     public String getName() {
         return name;
     }

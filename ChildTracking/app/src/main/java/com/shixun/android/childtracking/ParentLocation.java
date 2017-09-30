@@ -1,26 +1,28 @@
 package com.shixun.android.childtracking;
 
 /**
- * Created by shixunliu on 26/9/17.
+ * Created by markchunyong on 2017/9/30.
  */
 
 public class ParentLocation {
 
     @com.google.gson.annotations.SerializedName("longtitude")
-    private double longtitude;
+    private double longtitude;                                  //Parent set tracking location longtitude
     @com.google.gson.annotations.SerializedName("latitude")
-    private double lagitude;
+    private double lagitude;                                    //Parent set tracking location latitude
     @com.google.gson.annotations.SerializedName("radius")
-    private int radius;
+    private int radius;                                         //Parent set tracking location radius
     @com.google.gson.annotations.SerializedName("id")
-    private String mId;
+    private String mId;                                         //Parent set tracking location data id
 
+    //Constructor of parent tracked location data
     public ParentLocation(double longtitude, double lagitude, int radius) {
         this.longtitude = longtitude;
         this.lagitude = lagitude;
         this.radius = radius;
     }
 
+    //Set of accessor and mutator
     public double getLongtitude() {
         return longtitude;
     }
@@ -51,10 +53,5 @@ public class ParentLocation {
 
     public void setId(String id) {
         mId = id;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof ParentLocation && ((ParentLocation) o).mId == mId;
     }
 }

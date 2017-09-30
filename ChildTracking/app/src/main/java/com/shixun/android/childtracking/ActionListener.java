@@ -13,5 +13,4 @@ public interface ActionListener {
     void stopTracking();
     void jumpToLogin(Bundle bundle);
     void jumpToRegister();
-
 }

@@ -33,9 +33,7 @@ public class MainActivity extends AbstractFragmentActivity implements ActionList
     }
 
     @Override
-    public void onClick(View v) {
-
-    }
+    public void onClick(View v) {}
 
     @Override
     public void loginAsParent() {
