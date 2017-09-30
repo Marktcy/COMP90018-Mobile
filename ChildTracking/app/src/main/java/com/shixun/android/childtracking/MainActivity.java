@@ -29,7 +29,7 @@ public class MainActivity extends AbstractFragmentActivity implements ActionList
 
     @Override
     protected Fragment createFragment() {
-        return new FragmentLogin();
+        return new FragmentHome();
     }
 
     @Override
@@ -57,6 +57,16 @@ public class MainActivity extends AbstractFragmentActivity implements ActionList
     public void stopTracking() {
         Intent stopIntent = new Intent(this, TrackingChildService.class);
         stopService(stopIntent);
+    }
+
+    @Override
+    public void jumpToLogin() {
+//        nevigateToFragment(FragmentLogin.class, false, null);
+    }
+
+    @Override
+    public void jumpToRegister() {
+        nevigateToFragment(FragmentRegister.class, false, null);
     }
 
     private void nevigateToFragment(Class FragmentGeneral, boolean isUpSet, Bundle bundle) {

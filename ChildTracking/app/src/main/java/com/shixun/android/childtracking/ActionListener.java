@@ -9,4 +9,7 @@ public interface ActionListener {
     void loginAsChild();
     void startTracking();
     void stopTracking();
+    void jumpToLogin();
+    void jumpToRegister();
+
 }
