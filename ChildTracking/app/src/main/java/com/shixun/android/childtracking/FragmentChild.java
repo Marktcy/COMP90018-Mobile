@@ -168,7 +168,7 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
                     @Override
                     protected Void doInBackground(Void... params) {
                         try {
-                            mClient.invokeApi("ClearChildLocation");
+                            //mClient.invokeApi("ClearChildLocation");
                             mTable.insert(currentChildLocation);
                         } catch (final Exception e) {
                             createAndShowDialogFromTask(e, "Error");
