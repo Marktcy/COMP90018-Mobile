@@ -73,8 +73,8 @@ public class FragmentRegister extends FragmentGeneral {
 
             final UserDatabase newUser = new UserDatabase(email.getText().toString(),password.getText().toString(),name.getText().toString(), spMemeber.getSelectedItem().toString().equals("Parent"));
 
-            String userAccount = email.getText().toString();
-            String userPassword = password.getText().toString();
+            final String userAccount = email.getText().toString();
+            final String userPassword = password.getText().toString();
 
             ArrayList<Pair<String, String>> parameters = new ArrayList<>();
 
@@ -92,6 +92,13 @@ public class FragmentRegister extends FragmentGeneral {
                                 .setTitleText("Good job!")
                                 .setContentText("You register the account!")
                                 .show();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("account", userAccount);
+                        bundle.putString("password", userPassword);
+                        if(getActivity() instanceof ActionListener) {
+                            ((ActionListener) getActivity()).jumpToLogin(bundle);
+                        }
                     } else {
                         new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Oops...")

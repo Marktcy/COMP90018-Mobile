@@ -4,19 +4,26 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by shixunliu on 26/9/17.
@@ -24,12 +31,11 @@ import butterknife.OnClick;
 
 public class FragmentLogin extends FragmentGeneral {
     private MobileServiceClient mobileServiceClient;
-    private MobileServiceTable<UserDatabase> mobileServiceTable;
 
     @BindView(R.id.btLogin)
-    Button btLogin;
-    @BindView(R.id.member)
-    Spinner spMemeber;
+    com.dd.processbutton.iml.ActionProcessButton buttonLogin;
+    @BindView(R.id.btRegister)
+    com.dd.processbutton.iml.ActionProcessButton buttonRegister;
     @BindView(R.id.email)
     EditText email;
     @BindView(R.id.password)
@@ -41,16 +47,13 @@ public class FragmentLogin extends FragmentGeneral {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Spinner spinner = (Spinner) getActivity().findViewById(R.id.member);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.member, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            email.setText(bundle.getString("account"), TextView.BufferType.EDITABLE);
+            password.setText(bundle.getString("password"), TextView.BufferType.EDITABLE);
+        }
     }
 
     @Override
@@ -60,11 +63,17 @@ public class FragmentLogin extends FragmentGeneral {
         super.onResume();
     }
 
+    @OnClick(R.id.btRegister)
+    void register() {
+        if(getActivity() instanceof ActionListener) {
+            ((ActionListener) getActivity()).jumpToRegister();
+        }
+    }
+
     @OnClick(R.id.btLogin)
     void login() {
         try {
             mobileServiceClient = new MobileServiceClient(getResources().getString(R.string.server), getActivity());
-            mobileServiceTable = mobileServiceClient.getTable(UserDatabase.class);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -72,35 +81,50 @@ public class FragmentLogin extends FragmentGeneral {
         if (isAccountPasswordValid()) {
             String userAccount = email.getText().toString();
             String userPassword = password.getText().toString();
-            //String selectedMember = spMemeber.getSelectedItem().toString().trim();
-            //int result = UserDataManager.findUser(userAccount, userPassword);
-            UserDatabase user = new UserDatabase(userAccount,userPassword);
+
+            ArrayList<Pair<String, String>> parameters = new ArrayList<>();
+
             parameters.add(new Pair<>("email" , userAccount));
             parameters.add(new Pair<>("password" , userPassword));
+            parameters.add(new Pair<>("type", "checkPassword"));
 
-
-
-
-
-            if (result == 1) {
-                if (selectedMember == getResources().getString(R.string.parent)) {
-                    ((ActionListener) getActivity()).loginAsParent();
-                } else if (selectedMember == getResources().getString(R.string.child)) {
-                    ((ActionListener) getActivity()).loginAsChild();
+            ListenableFuture<CheckAccount> result = mobileServiceClient.invokeApi("Authentication", "GET", parameters, CheckAccount.class);
+            Futures.addCallback(result, new FutureCallback<CheckAccount>() {
+                @Override
+                public void onSuccess(CheckAccount result) {
+                    if (result.result.equals("Parent")) {
+                        if(getActivity() instanceof ActionListener) {
+                            ((ActionListener) getActivity()).loginAsParent();
+                        }
+                    } else if (result.result.equals("Children")) {
+                        if(getActivity() instanceof ActionListener) {
+                            ((ActionListener) getActivity()).loginAsChild();
+                        }
+                    } else {
+                        new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("Oops...")
+                                .setContentText("Wrong account and password!")
+                                .show();
+                    }
                 }
-                Toast.makeText(getActivity(), "Login in successful", Toast.LENGTH_SHORT).show();
-            } else if (result == 0) {
-                Toast.makeText(getActivity(), "Login in failed", Toast.LENGTH_SHORT).show();
-            }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Oops...")
+                            .setContentText("SignIn failed!")
+                            .show();
+                }
+            });
         }
     }
 
     public boolean isAccountPasswordValid() {
-        if (email.getText().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Account cannot be empty", Toast.LENGTH_SHORT).show();
-            return false;
-        } else if (password.getText().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Password cannot be empty", Toast.LENGTH_SHORT).show();
+        if (email.getText().toString().trim().equals("") || password.getText().toString().trim().equals("")) {
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Account and password cannot be empty")
+                    .show();
             return false;
         }
         return true;

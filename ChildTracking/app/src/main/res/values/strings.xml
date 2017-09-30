@@ -9,11 +9,9 @@
     <string name="child">Child</string>
     <string name="setBoundary">Set Boundary</string>
     <string name="server">https://positiontracking.azurewebsites.net</string>
-<<<<<<< HEAD
-    <string name="btRegister">SignIn</string>
-    <string name="btLogin">SignUp</string>
-    <string name="myemail">Account ( Email )</string>
-=======
+    <string name="signin">SignIn</string>
+    <string name="signup">SignUp</string>
+    <string name="account">Account(Email)</string>
     <string name="boundary">BOUNDARY</string>
     <string name="tracking">START TRACKING</string>
     <string name="stop">STOP TRACKING</string>
@@ -22,21 +20,15 @@
     <string name="btRegister">REGISTER</string>
     <string name="btLogin">LOGIN</string>
     <string name="myemail">Account(Email)</string>
->>>>>>> GoogleMapTest
     <string name="email">Email</string>
     <string name="mypassword">Set password</string>
     <string name="name">Name</string>
     <string name="repassword">Enter password again</string>
     <string name="role">Select your role</string>
-<<<<<<< HEAD
     <string name="Success">Success</string>
     <string name="Loading">Loading</string>
-
-=======
->>>>>>> GoogleMapTest
     <string-array name="member">
         <item>@string/parent</item>
         <item>@string/child</item>
     </string-array>
-
 </resources>
