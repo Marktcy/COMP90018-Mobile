@@ -102,11 +102,7 @@ public class FragmentLogin extends FragmentGeneral {
         } else if (password.getText().toString().trim().equals("")) {
             Toast.makeText(getActivity(), "Password cannot be empty", Toast.LENGTH_SHORT).show();
             return false;
-        } else if (spMemeber.getSelectedItem().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Please select your role", Toast.LENGTH_SHORT).show();
-            return false;
         }
-
         return true;
     }
 
