@@ -4,6 +4,7 @@ package com.shixun.android.childtracking;
  * Created by markchunyong on 2017/9/30.
  */
 
+// objects used for sending location info of child to back end
 public class ChildLocation {
 
     @com.google.gson.annotations.SerializedName("longtitude")

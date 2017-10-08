@@ -20,7 +20,7 @@
     <string name="btRegister">REGISTER</string>
     <string name="btLogin">LOGIN</string>
     <string name="myemail">ACCOUNT (Email)</string>
-    <string name="email">EMAL</string>
+    <string name="email">EMAIL</string>
     <string name="mypassword">PASSWORD</string>
     <string name="name">NAME</string>
     <string name="repassword">PASSWORD AGAIN</string>

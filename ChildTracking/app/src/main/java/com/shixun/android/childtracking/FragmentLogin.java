@@ -41,6 +41,12 @@ public class FragmentLogin extends FragmentGeneral {
         return R.layout.fragment_login;
     }
 
+
+    /**
+     * fill the editview with the account and password set in registration
+     * @param view
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -51,6 +57,9 @@ public class FragmentLogin extends FragmentGeneral {
         }
     }
 
+    /**
+     * hide action bar
+     */
     @Override
     public void onResume() {
         ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
@@ -58,6 +67,9 @@ public class FragmentLogin extends FragmentGeneral {
         super.onResume();
     }
 
+    /**
+     * click register btn to call the method in MainAcitivty
+     */
     @OnClick(R.id.btRegister)
     void register() {
         if(getActivity() instanceof ActionListener) {
@@ -65,18 +77,25 @@ public class FragmentLogin extends FragmentGeneral {
         }
     }
 
+    /**
+     * click on login btn
+     */
     @OnClick(R.id.btLogin)
     void login() {
+
+        // connect to back end
         try {
             mobileServiceClient = new MobileServiceClient(getResources().getString(R.string.server), getActivity());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
+        // if password and account is not blank
         if (isAccountPasswordValid()) {
             String userAccount = email.getText().toString();
             String userPassword = password.getText().toString();
 
+            // create parameter and send it to back end to verify password and account
             ArrayList<Pair<String, String>> parameters = new ArrayList<>();
 
             parameters.add(new Pair<>("email" , userAccount));
@@ -87,15 +106,22 @@ public class FragmentLogin extends FragmentGeneral {
             Futures.addCallback(result, new FutureCallback<CheckAccount>() {
                 @Override
                 public void onSuccess(CheckAccount result) {
+
+                    // login successfully as parent
                     if (result.result.equals("Parent")) {
+
+                        // call the loginAsParent() in MainActivity
                         if(getActivity() instanceof ActionListener) {
                             ((ActionListener) getActivity()).loginAsParent();
                         }
+                        // login successfully as children
                     } else if (result.result.equals("Children")) {
+                        // call the loginAsChild() in MainActivity
                         if(getActivity() instanceof ActionListener) {
                             ((ActionListener) getActivity()).loginAsChild();
                         }
                     } else {
+                        // pop up alarm
                         new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Oops...")
                                 .setContentText("Wrong account and password!")
@@ -103,6 +129,7 @@ public class FragmentLogin extends FragmentGeneral {
                     }
                 }
 
+                // fail to connect to back end
                 @Override
                 public void onFailure(Throwable throwable) {
                     new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
