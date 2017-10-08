@@ -300,7 +300,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
                             mMap.clear();
                             mMap.addMarker(new MarkerOptions().position(userLocation).title("Center"));
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 20));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
                             mMap.addCircle(new CircleOptions()
                                     .center(userLocation)
                                     .radius(Integer.parseInt(radius))
