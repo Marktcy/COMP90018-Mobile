@@ -1,8 +1,6 @@
 package com.shixun.android.childtracking;
 
-import android.app.Service;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,7 +14,6 @@ import butterknife.ButterKnife;
  */
 
 public class FragmentGeneral extends Fragment {
-    public Vibrator vibrator;
     protected int getLayoutID() {return 0;}
     private static FragmentGeneral fragment;
     private View view;
@@ -25,7 +22,6 @@ public class FragmentGeneral extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-        vibrator=(Vibrator)getActivity().getSystemService(Service.VIBRATOR_SERVICE);
     }
 
     @Nullable

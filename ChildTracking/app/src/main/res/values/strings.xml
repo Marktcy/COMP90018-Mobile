@@ -12,21 +12,22 @@
     <string name="signin">SignIn</string>
     <string name="signup">SignUp</string>
     <string name="account">Account(Email)</string>
-    <string name="boundary">BOUNDARY</string>
+    <string name="boundary">SET CENTER</string>
     <string name="tracking">START TRACKING</string>
     <string name="stop">STOP TRACKING</string>
     <string name="settings">SETTINGS</string>
     <string name="radius">TYPE IN RADIUS</string>
     <string name="btRegister">REGISTER</string>
     <string name="btLogin">LOGIN</string>
-    <string name="myemail">Account(Email)</string>
-    <string name="email">Email</string>
-    <string name="mypassword">Set password</string>
-    <string name="name">Name</string>
-    <string name="repassword">Enter password again</string>
+    <string name="myemail">ACCOUNT (Email)</string>
+    <string name="email">EMAL</string>
+    <string name="mypassword">PASSWORD</string>
+    <string name="name">NAME</string>
+    <string name="repassword">PASSWORD AGAIN</string>
     <string name="role">Select your role</string>
     <string name="Success">Success</string>
     <string name="Loading">Loading</string>
+    <string name="welcome">WELCOME TO CHILD TRACKING</string>
     <string-array name="member">
         <item>@string/parent</item>
         <item>@string/child</item>
