@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -70,6 +71,14 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
     }
 
     @Override
+    public void onResume() {
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Back");
+        super.onResume();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
@@ -99,14 +108,6 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        // set the title
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setTitle(getResources().getString(R.string.setBoundary));
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -253,6 +254,17 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
                 childMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

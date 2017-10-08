@@ -42,7 +42,7 @@ public class MainActivity extends AbstractFragmentActivity implements ActionList
 
     @Override
     public void loginAsChild() {
-        nevigateToFragment(FragmentChild.class, false, null);
+        nevigateToFragment(FragmentChild.class, true, null);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class MainActivity extends AbstractFragmentActivity implements ActionList
 
     @Override
     public void jumpToRegister() {
-        nevigateToFragment(FragmentRegister.class, false, null);
+        nevigateToFragment(FragmentRegister.class, true, null);
     }
 
     private void nevigateToFragment(Class FragmentGeneral, boolean isUpSet, Bundle bundle) {

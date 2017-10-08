@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -264,7 +263,10 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         radius = etRadius.getText().toString();
 
         if (userLocation  == null || radius.equals("")) {
-            Toast.makeText(getActivity(), "Please set location or radius", Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Please set both center and boundary!")
+                    .show();
         } else {
 
             new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
@@ -300,7 +302,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
                             mMap.clear();
                             mMap.addMarker(new MarkerOptions().position(userLocation).title("Center"));
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
                             mMap.addCircle(new CircleOptions()
                                     .center(userLocation)
                                     .radius(Integer.parseInt(radius))
@@ -331,12 +333,11 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         }
     }
 
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        ((ActionListener) getActivity()).stopTracking();
         if(mTextToSpeech !=null){
             mTextToSpeech.stop();
             mTextToSpeech.shutdown();
