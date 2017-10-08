@@ -43,41 +43,22 @@
         android:hint="@string/repassword"
         android:inputType="textPassword"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="20dp"
-            android:text="@string/role"
-            android:layout_marginStart="70dp"
-            android:textSize="20sp"
-            android:maxLines="1"
-            android:layout_weight="2" />
-
-
-        <Spinner
-            android:id="@+id/member"
-            android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="70dp"
-            android:layout_weight="0.2"
-            />
-    </LinearLayout>
-
-
-    <Button
-        android:id="@+id/btRegister"
+    <Spinner
+        android:id="@+id/member"
         android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_weight="0.2"/>
+
+    <com.dd.processbutton.iml.ActionProcessButton
+        android:id="@+id/btRegister"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="@string/btRegister"
-        android:layout_marginTop="50dp"
-        android:layout_gravity="center_horizontal"/>
-
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
 
 </LinearLayout>

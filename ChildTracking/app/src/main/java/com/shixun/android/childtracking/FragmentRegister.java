@@ -2,12 +2,12 @@ package com.shixun.android.childtracking;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -58,6 +58,13 @@ public class FragmentRegister extends FragmentGeneral {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(null);
+        super.onResume();
     }
 
     @OnClick(R.id.btRegister)
@@ -120,22 +127,40 @@ public class FragmentRegister extends FragmentGeneral {
 
     public boolean isAccountPasswordValid() {
         if (name.getText().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Please enter your name", Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Please enter your name!")
+                    .show();
             return false;
         }else if (email.getText().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Account cannot be empty", Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Please enter your email!")
+                    .show();
             return false;
         } else if (password.getText().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Password cannot be empty", Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Please enter your password!")
+                    .show();
             return false;
         } else if (repassword.getText().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Please verify your password", Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Please verify password!")
+                    .show();
             return false;
         } else if (!repassword.getText().toString().trim().equals(password.getText().toString().trim())){
-            Toast.makeText(getActivity(), "Password is not the same", Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Password is not the same!")
+                    .show();
             return false;
         } else if (spMemeber.getSelectedItem().toString().trim().equals("")) {
-            Toast.makeText(getActivity(), "Please select your role", Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Please select your role!")
+                    .show();
             return false;
         }
         return true;

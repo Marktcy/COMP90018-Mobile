@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.shixun.android.childtracking"
-          xmlns:tools="http://schemas.android.com/tools">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.shixun.android.childtracking">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -26,19 +26,21 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDUDXUgdc4a8Ne9VW74PtBENygY87QFaHI"/>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".StartUp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity"/>
 
         <service
             android:name=".TrackingChildService"
             android:enabled="true"
             android:exported="true">
         </service>
+
     </application>
 
 </manifest>
