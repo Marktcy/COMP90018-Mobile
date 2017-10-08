@@ -92,7 +92,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
     }
 
     /**
-     * Create the mapView
+     * Create the mapView and menu
      * @param view
      * @param savedInstanceState
      */
@@ -123,6 +123,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
         EventBus.getDefault().register(this);
 
+        // register TextToSpeech
         mTextToSpeech=new TextToSpeech(getContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -132,6 +133,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
             }
         });
 
+        // hide tool bar
         if (toolbar != null) {
             // set the title
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
@@ -140,6 +142,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
                     .setTitle(null);
         }
 
+        // connect to back end
         try {
             // Mobile Service URL and key
             mClient = new MobileServiceClient(
@@ -189,6 +192,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            // click set boundary btn and jump to place picker
             case R.id.set_boundary:
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                 try {
@@ -201,7 +205,9 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
                 }
 
                 break;
+            // click start tracking and setup
             case R.id.start_tracking:
+                // show dialog
                 if(getActivity() instanceof ActionListener) {
                     new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
                             .setTitleText("Are you sure?")
@@ -218,6 +224,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
                             .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                 @Override
                                 public void onClick(SweetAlertDialog sDialog) {
+                                    // call startTracking() in MainActivity
                                     sDialog.dismissWithAnimation();
                                     ((ActionListener) getActivity()).startTracking();
                                 }
@@ -226,6 +233,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
                 }
 
                 break;
+            // click stop tracking
             case R.id.stop_tracking:
                 if(getActivity() instanceof ActionListener) {
                     new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
@@ -244,6 +252,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
                                 @Override
                                 public void onClick(SweetAlertDialog sDialog) {
                                     sDialog.dismissWithAnimation();
+                                    // call stopTracking()
                                     ((ActionListener) getActivity()).stopTracking();
                                     if (childMarker != null) {
                                         childMarker.remove();
@@ -262,6 +271,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
 
         radius = etRadius.getText().toString();
 
+        // if center and radius is not defined
         if (userLocation  == null || radius.equals("")) {
             new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("Oops...")
@@ -269,6 +279,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
                     .show();
         } else {
 
+            // set boundary and update data to backend
             new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("Are you sure?")
                     .setContentText("The boundary " + radius + "M will be set around " + place.getAddress() + "!")
@@ -316,6 +327,7 @@ public class FragmentParent extends FragmentGeneral implements OnMapReadyCallbac
         }
     }
 
+    // get child location data send from service
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LatLng latLng) {
         if (childMarker != null) {

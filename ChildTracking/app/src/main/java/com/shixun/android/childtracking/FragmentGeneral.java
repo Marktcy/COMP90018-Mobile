@@ -11,7 +11,11 @@ import butterknife.ButterKnife;
 
 /**
  * Created by shixunliu on 26/9/17.
+ *
+ * general method of fragment are abstracted into FragmentGeneral
+ * any fragment extends from it will be instantiated
  */
+
 
 public class FragmentGeneral extends Fragment {
     protected int getLayoutID() {return 0;}
@@ -30,15 +34,5 @@ public class FragmentGeneral extends Fragment {
         view = inflater.inflate(getLayoutID(), container, false);
         ButterKnife.bind(this, view);
         return view;
-    }
-
-    public static FragmentGeneral newInstance() {
-
-        Bundle args = new Bundle();
-        if(fragment == null) {
-            fragment = new FragmentGeneral();
-            fragment.setArguments(args);
-        }
-        return fragment;
     }
 }

@@ -9,10 +9,18 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+/**
+ * Created by shixunliu on 26/9/17.
+ *
+ * The abstract activity that can startup fragment
+ * any activity extended from it can load fragment directly through createFragment()
+ */
+
 public abstract class AbstractFragmentActivity extends AppCompatActivity {
 
     protected abstract Fragment createFragment();
     protected FragmentManager mFragmentManager = null;
+
     //the system time when click back button at first time
     private long lastBackTime = 0;
     //the system time when click back button at second time
@@ -23,6 +31,7 @@ public abstract class AbstractFragmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_abstract);
 
+        // loading fragment to container
         mFragmentManager = getSupportFragmentManager();
         Fragment fragment = mFragmentManager.findFragmentById(R.id.fragment_container);
 
@@ -33,10 +42,11 @@ public abstract class AbstractFragmentActivity extends AppCompatActivity {
             Log.d("activity", "Not null");
         }
 
-        //unable the screen orientatoin
+        //unable the screen orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
+    // press the back button twice within 2 seconds to quit the app
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         //when click on back button

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 /**
  * Created by shixunliu on 27/9/17.
+ * This is the main activity that used for managing all the fragment and the transaction between them
  */
 
 public class MainActivity extends AbstractFragmentActivity implements ActionListener, View.OnClickListener {

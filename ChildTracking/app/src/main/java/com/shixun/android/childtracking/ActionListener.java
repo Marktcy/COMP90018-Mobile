@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 /**
  * Created by shixunliu on 26/9/17.
+ * registered actions to be recalled in MainActivity
  */
 
 public interface ActionListener {

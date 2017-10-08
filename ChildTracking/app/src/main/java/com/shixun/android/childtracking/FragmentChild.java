@@ -54,8 +54,6 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
     private String                             serviceProvider;
     private MobileServiceClient                mClient;
     private MobileServiceTable<ChildLocation>  mTable;
-    private MobileServiceTable<ParentLocation> mPtable;
-    private List<ParentLocation>               parentLocations;
     private LatLng                             userLocation;
 
     @BindView(R.id.child_map)
@@ -109,6 +107,7 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        //get location service provider
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -120,6 +119,7 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
             serviceProvider = LocationManager.GPS_PROVIDER;
         }
 
+        // connect to backend
         try {
             // Mobile Service URL and key
             mClient = new MobileServiceClient(
@@ -140,7 +140,6 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
 
             // Get the Mobile Service Table instance to use
             mTable = mClient.getTable(ChildLocation.class);
-            mPtable = mClient.getTable(ParentLocation.class);
 
         } catch (MalformedURLException e) {
             createAndShowDialog(new Exception("There was an error creating the Mobile Service. Verify the URL"), "Error");
@@ -153,6 +152,7 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         childMap = googleMap;
 
+        // get currently location
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -164,7 +164,7 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
                 currentChildLocation.setLongtitude(userLocation.longitude);
                 currentChildLocation.setLatitude(userLocation.latitude);
 
-                // Insert the new item
+                // send location data to backend in background
                 AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
@@ -180,10 +180,12 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
 
                 runAsyncTask(task);
 
+                // remove marker in the map
                 childMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
                 childMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
                 Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
 
+                // show the address of current location
                 try {
                     List<Address> listAddresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                     if (listAddresses != null && listAddresses.size() > 0) {
@@ -256,6 +258,9 @@ public class FragmentChild extends FragmentGeneral implements OnMapReadyCallback
         }
     }
 
+    /**
+     *  up navigation
+      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
